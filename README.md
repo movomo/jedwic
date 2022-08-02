@@ -72,6 +72,6 @@ It's a simple hash table with [FNV-1a][1] hash and linked list buckets.
 The initial capacity is 7 and gradually grows when 2/3 of capacity is used.
 The next capacity is chosen among the hard-coded prime table.
 
-Liks `JsonArray`, this also can shrink conservatively.
+Like `JsonArray`, this also can shrink conservatively.
 
 [1]: http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-source
