@@ -141,7 +141,7 @@ void print_tokens(Lexer *lexer) {
 
 int test_lexer() {
     Lexer *lexer;
-    // Token *token;
+    Token *token;
 
     lexer = lexer_construct("\
         [\
@@ -156,7 +156,14 @@ int test_lexer() {
             \"x\\udead\\ubeef\"\
         ]\
     ");
-    print_tokens(lexer);
+    // print_tokens(lexer);
+    while (1) {
+        token = lexer_next(lexer);
+        assert(token != NULL);
+        if (token->kind == TOKEN_EOF) {
+            break;
+        }
+    }
     lexer_destruct(lexer);
 
     return 1;
