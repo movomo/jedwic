@@ -4,7 +4,6 @@
 #include <stddef.h>
 
 #include "json.h"
-#include "token.h"
 
 
 typedef enum ASTKind {
@@ -15,13 +14,19 @@ typedef enum ASTKind {
     AST_OBJECT
 } ASTKind;
 
-
 typedef struct ASTNode {
     size_t len;
     struct ASTNode **children;
-    Token *token;
+    char *value;
     ASTKind kind;
 } ASTNode;
+
+
+/** Construct a null node and return its pointer or NULL. */
+ASTNode *ast_construct_nullnode(Token *token);
+
+/** Construct a true/false node and return its pointer or NULL. */
+ASTNode *ast_construct_boolnode(Token *token);
 
 
 #endif
