@@ -18,7 +18,7 @@ typedef enum ASTKind {
 
 typedef struct ASTNode {
     size_t len;
-    ASTNode **children;
+    struct ASTNode **children;
     Token *token;
     ASTKind kind;
 } ASTNode;
