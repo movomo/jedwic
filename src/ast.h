@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "json.h"
+#include "token.h"
 
 
 typedef enum ASTKind {

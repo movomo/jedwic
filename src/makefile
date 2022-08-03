@@ -16,7 +16,7 @@ test.exe: test.c $(ALLHEADERS) $(ALLOBJECTS)
 json.o: json.h jsonarr.h
 jsonarr.o: json.h jsonarr.h
 jsonobj.o: json.h jsonobj.h
-ast.o: ast.h
+ast.o: ast.h token.h
 token.o: token.h
 lexer.o: token.h lexer.h
 parser.o: ast.h token.h lexer.h parser.h

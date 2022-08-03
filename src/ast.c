@@ -2,8 +2,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "ast.h"
+#include "token.h"
 
 
 #define AST_INITIAL_CAPACITY        1
@@ -47,7 +49,6 @@ ASTNode *ast_construct_nullnode(Token *token) {
         return NULL;
     }
     node->kind = AST_NULL;
-    node->token = token;
     return node;
 }
 
@@ -59,7 +60,6 @@ ASTNode *ast_construct_boolnode(Token *token) {
         return NULL;
     }
     node->kind = AST_BOOL;
-    node->token = token;
     return node;
 }
 
