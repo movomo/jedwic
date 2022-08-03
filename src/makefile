@@ -4,8 +4,8 @@ CC = gcc
 
 EXEC = test.exe
 CFLAGS_TEST = -Wall
-ALLHEADERS = json.h jsonarr.h jsonobj.h ast.h token.h lexer.h
-ALLOBJECTS = json.o jsonarr.o jsonobj.o ast.o token.o lexer.o
+ALLHEADERS = json.h jsonarr.h jsonobj.h ast.h token.h lexer.h parser.h
+ALLOBJECTS = json.o jsonarr.o jsonobj.o ast.o token.o lexer.o parser.o
 
 run: $(EXEC)
 	./$(EXEC)
@@ -19,3 +19,4 @@ jsonobj.o: json.h jsonobj.h
 ast.o: ast.h
 token.o: token.h
 lexer.o: token.h lexer.h
+parser.o: ast.h token.h lexer.h parser.h
