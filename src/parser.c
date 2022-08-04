@@ -96,7 +96,6 @@ static ASTNode *_parser_array(Parser *parser) {
     Token **token = &parser->token;
 
     if (!parent) {
-        ast_destruct_node(parent);
         return _parser_error_memory();
     }
     if (!_parser_eat(parser, TOKEN_OPENING_SQUARE_BRACKET)) {
