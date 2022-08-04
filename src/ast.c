@@ -202,17 +202,21 @@ ASTNode *ast_construct_valuenode(Token *token) {
 /** Recursively destruct entrie AST starting from *root*. */
 void *ast_destruct(ASTNode *root) {
     size_t i;
-    for (i = 0; i < root->len; i++) {
-        ast_destruct(root->children[i]);
+    if (root) {
+        for (i = 0; i < root->len; i++) {
+            ast_destruct(root->children[i]);
+        }
+        ast_destruct_node(root);
     }
-    ast_destruct_node(root);
 }
 
 /** Destruct a single AST node as well as textual values. */
 void *ast_destruct_node(ASTNode *node) {
-    free(node->value);
-    free(node->children);
-    free(node);
+    if (node) {
+        free(node->value);
+        free(node->children);
+        free(node);
+    }
 }
 
 /** Append a child node to the parent node and report success as bool. */

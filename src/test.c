@@ -203,7 +203,7 @@ void gen_ast_expect(char *code) {
     assert(node == NULL);
     lexer_destruct(lexer);
     parser_destruct(parser);
-    // ast_destruct(node);
+    ast_destruct(node);
 }
 
 int test_parser() {
