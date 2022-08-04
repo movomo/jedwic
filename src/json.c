@@ -1,10 +1,72 @@
+#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
+#include "ast.h"
+#include "token.h"
 #include "json.h"
 #include "jsonarr.h"
 #include "jsonobj.h"
+#include "lexer.h"
+#include "parser.h"
 
+
+static JsonValue _json_visit(ASTNode *node);
+
+
+static JsonValue _json_visit_nullnode(ASTNode *node) {
+    JsonValue jsval = { JSON_NULL, .value.as_bool = false };
+    return jsval;
+}
+
+static JsonValue _json_visit_boolnode(ASTNode *node) {
+    JsonValue jsval = { JSON_BOOL };
+    jsval.value.as_bool = node->value[0] == 't';
+    return jsval;
+}
+
+static JsonValue _json_visit_numbernode(ASTNode *node) {
+    JsonValue jsval = { JSON_NUMBER };
+    jsval.value.as_num = atof(node->value);
+    return jsval;
+}
+
+static JsonValue _json_visit(ASTNode *node) {
+    JsonValue jsval;
+    
+    switch (node->kind) {
+        case AST_NULL:
+            return _json_visit_nullnode(node);
+        case AST_BOOL:
+            return _json_visit_boolnode(node);
+        case AST_NUMBER:
+            return _json_visit_numbernode(node);
+        default:
+            assert(0);
+            break;
+    }
+}
+
+static JsonValue _json_decode(Lexer *lexer, bool *error) {
+    Parser *parser = parser_construct(lexer);
+    ASTNode *root = parser_parse(parser);
+    JsonValue jsval;
+    *error = true;
+
+    if (!root) {
+        parser_destruct(parser);
+        return jsval;
+    }
+
+    *error = false;
+    jsval = _json_visit(root);
+    // On successful parsing, EOF token still remains.
+    token_destruct(parser->token);
+    parser_destruct(parser);
+    ast_destruct(root);
+    return jsval;
+}
 
 /** Test equqlity between JsonValue.
  * Arrays and Objects are recursively tested.
@@ -84,7 +146,23 @@ bool jsonval_equal(JsonValue *a, JsonValue *b) {
 }
 
 
-void jsonval_fprint(FILE *stream, JsonValue *item) {
+/** Decode JSON string and return as a pointer to JsonValue.
+ *
+ * Set *error* value to true when parsing failed.
+ * *text* is not destroyed after decoding.
+ */
+JsonValue json_sdecode(char *text, bool *error) {
+    bool _error;
+    Lexer *lexer = lexer_construct(text);
+    JsonValue jsval = _json_decode(lexer, &_error);
+    *error = _error;
+    return jsval;
+}
+
+JsonValue *json_fdecode(FILE *json_r) {}
+
+
+void json_fencode(FILE *stream, JsonValue *item) {
     switch (item->type) {
         case JSON_NULL:
             fprintf(stream, "null");

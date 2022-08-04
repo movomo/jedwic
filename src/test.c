@@ -246,6 +246,33 @@ int test_parser(bool quiet) {
     return 1;
 }
 
+int test_decoder() {
+    JsonValue jsval;
+    bool error;
+
+    jsval = json_sdecode("null", &error);
+    json_fencode(stdout, &jsval);
+    printf("\n");
+
+    jsval = json_sdecode("true", &error);
+    json_fencode(stdout, &jsval);
+    printf("\n");
+
+    jsval = json_sdecode("false", &error);
+    json_fencode(stdout, &jsval);
+    printf("\n");
+
+    jsval = json_sdecode("0", &error);
+    json_fencode(stdout, &jsval);
+    printf("\n");
+
+    jsval = json_sdecode("1.5e3", &error);
+    json_fencode(stdout, &jsval);
+    printf("\n");
+
+    return 1;
+}
+
 int main() {
     if (test_arr()) {
         printf("JsonArray tests passed.\n");
@@ -261,6 +288,10 @@ int main() {
 
     if (test_parser(true)) {
         printf("Parser tests passed.\n");
+    }
+
+    if (test_decoder()) {
+        printf("Decoder tests passed.\n");
     }
 
     return 0;

@@ -1,6 +1,7 @@
 #ifndef __JSON_AST_H__
 #define __JSON_AST_H__
 
+#include <stdbool.h>
 #include <stddef.h>
 
 #include "token.h"

@@ -23,16 +23,11 @@ typedef struct JsonObjectEntry JsonObjectEntry;
 typedef struct JsonObject JsonObject;
 
 
-#if UINTPTR_MAX == 0xFFFFFFFFFFFFFFFF
-typedef double JsonNumber;
-#else
-typedef float JsonNumber;
-#endif
 struct JsonValue {
     JsonValueType type;
     union _JsonValue {
         bool as_bool;
-        JsonNumber as_num;
+        double as_num;
         char *as_str;
         JsonArray *as_arr;
         JsonObject *as_obj;
@@ -90,7 +85,14 @@ typedef struct JsonObjectIterator {
  */
 bool jsonval_equal(JsonValue *a, JsonValue *b);
 
-void jsonval_fprint(FILE *stream, JsonValue *item);
+/** Decode JSON string and return as a pointer to JsonValue.
+ *
+ * Set *error* value to true when parsing failed.
+ * *text* is not destroyed after decoding.
+ */
+JsonValue json_sdecode(char *text, bool *error);
+
+void json_fencode(FILE *stream, JsonValue *item);
 
 /** Implements 32-bit FNV-1a hash algorithm. Expects string as input.*/
 JsonObjectKeyHash json_default_hasher(void *data);
