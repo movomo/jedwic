@@ -138,6 +138,40 @@ static ASTNode *_parser_array(Parser *parser) {
     return parent;
 }
 
+static ASTNode *_parser_member(Parser *parser) {
+    ASTNode *parent = ast_construct_membernode(parser->token);
+    ASTNode *child = ast_construct_stringnode(parser->token);
+
+    if (!parent | !child) {
+        ast_destruct_node(parent);
+        ast_destruct_node(child);
+        return _parser_error_memory();
+    }
+    if (!_parser_eat(parser, TOKEN_STRING)) {
+        ast_destruct_node(parent);
+        ast_destruct_node(child);
+        return NULL;
+    }
+    if (!ast_append(parent, child)) {
+        ast_destruct_node(parent);
+        ast_destruct_node(child);
+        return _parser_error_memory();
+    }
+
+    if (!(child = _parser_value(parser))) {
+        ast_destruct_node(parent);
+        ast_destruct_node(child);
+        return NULL;
+    }
+    if (!ast_append(parent, child)) {
+        ast_destruct(parent);
+        ast_destruct_node(child);
+        return _parser_error_memory();
+    }
+
+    return parent;
+}
+
 static ASTNode *_parser_object(Parser *parser) {
     ASTNode *parent = ast_construct_objectnode(parser->token);
     ASTNode *child;

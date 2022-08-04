@@ -12,7 +12,8 @@ typedef enum ASTKind {
     AST_NUMBER,
     AST_STRING,
     AST_ARRAY,
-    AST_OBJECT
+    AST_OBJECT,
+    AST_MEMBER
 } ASTKind;
 
 typedef struct ASTNode {
@@ -38,6 +39,9 @@ ASTNode *ast_construct_stringnode(Token *token);
 
 /** Construct an array node and return its pointer or NULL. */
 ASTNode *ast_construct_arraynode(Token *token);
+
+/** Construct a member node and return its pointer or NULL. */
+ASTNode *ast_construct_membernode(Token *token);
 
 /** Construct an object node and return its pointer or NULL. */
 ASTNode *ast_construct_objectnode(Token *token);

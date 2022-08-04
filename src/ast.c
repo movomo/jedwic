@@ -36,6 +36,9 @@ static char *_ast_get_node_name(ASTKind kind) {
         case AST_OBJECT:
             strcpy(name, "Object");
             break;
+        case AST_MEMBER:
+            strcpy(name, "Member");
+            break;
         default:
             assert(0);
     }
@@ -179,6 +182,17 @@ ASTNode *ast_construct_arraynode(Token *token) {
         return NULL;
     }
     node->kind = AST_ARRAY;
+    return node;
+}
+
+/** Construct a member node and return its pointer or NULL. */
+ASTNode *ast_construct_membernode(Token *token) {
+    ASTNode *node = _ast_construct(token->value, 2);
+
+    if (!node) {
+        return NULL;
+    }
+    node->kind = AST_MEMBER;
     return node;
 }
 
