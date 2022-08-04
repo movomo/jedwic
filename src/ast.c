@@ -54,6 +54,7 @@ static ASTNode *_ast_construct(char *value, size_t capacity) {
         return NULL;
     }
     node->len = 0;
+    node->cap = capacity;
     node->value = malloc((val_len + 1) * sizeof (char));
     if (!node->value) {
         return NULL;
@@ -64,12 +65,36 @@ static ASTNode *_ast_construct(char *value, size_t capacity) {
     return node;
 }
 
-static bool _ast_grow(ASTNode *node) {}
+static bool _ast_grow(ASTNode *node) {
+    ASTNode **new_children;
+    size_t new_cap;
+
+    if (node->len < node->cap) {
+        return true;
+    } else {
+        new_cap = node->cap * AST_GROW_FACTOR;
+        new_children = malloc(new_cap * sizeof (ASTNode *));
+        if (!new_children) {
+            return false;
+        } else {
+            if (!memcpy(new_children,
+                        node->children,
+                        node->len * sizeof (ASTNode *))) {
+                free(new_children);
+                return false;
+            }
+        }
+    }
+    free(node->children);
+    node->children = new_children;
+    node->cap = new_cap;
+    return true;
+}
 
 
 /** Construct a null node and return its pointer or NULL. */
 ASTNode *ast_construct_nullnode(Token *token) {
-    ASTNode *node = _ast_construct(token->value, 0);
+    ASTNode *node = _ast_construct(token->value, -1);
 
     if (!node) {
         return NULL;
@@ -80,12 +105,26 @@ ASTNode *ast_construct_nullnode(Token *token) {
 
 /** Construct a true/false node and return its pointer or NULL. */
 ASTNode *ast_construct_boolnode(Token *token) {
-    ASTNode *node = _ast_construct(token->value, 0);
+    ASTNode *node = _ast_construct(token->value, -1);
 
     if (!node) {
         return NULL;
     }
     node->kind = AST_BOOL;
+    return node;
+}
+
+/** Construct a node representing a single JSON value.
+ *
+ * Return a pointer to the node, or NULL.
+ */
+ASTNode *ast_construct_valuenode(Token *token) {
+    ASTNode *node = _ast_construct(token->value, 1);
+
+    if (!node) {
+        return NULL;
+    }
+    node->kind = AST_VALUE;
     return node;
 }
 
@@ -105,7 +144,14 @@ void *ast_destruct_node(ASTNode *node) {
     free(node);
 }
 
-bool ast_append(ASTNode *parent, ASTNode *child) {}
+/** Append a child node to the parent node and report success as bool. */
+bool ast_append(ASTNode *parent, ASTNode *child) {
+    if (!_ast_grow(parent)) {
+        return false;
+    }
+    parent->children[parent->len++] = child;
+    return true;
+}
 
 /** Print a single AST node. */
 void *ast_print_node(ASTNode *node) {

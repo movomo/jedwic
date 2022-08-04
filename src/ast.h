@@ -11,11 +11,13 @@ typedef enum ASTKind {
     AST_BOOL,
     AST_STRING,
     AST_ARRAY,
-    AST_OBJECT
+    AST_OBJECT,
+    AST_VALUE
 } ASTKind;
 
 typedef struct ASTNode {
     size_t len;
+    size_t cap;
     struct ASTNode **children;
     char *value;
     ASTKind kind;
@@ -27,6 +29,15 @@ ASTNode *ast_construct_nullnode(Token *token);
 
 /** Construct a true/false node and return its pointer or NULL. */
 ASTNode *ast_construct_boolnode(Token *token);
+
+/** Construct a node representing a single JSON value.
+ *
+ * Return a pointer to the node, or NULL.
+ */
+ASTNode *ast_construct_valuenode(Token *token);
+
+/** Append a child node to the parent node and report success as bool. */
+bool ast_append(ASTNode *parent, ASTNode *child);
 
 /** Recursively destruct entrie AST starting from *root*. */
 void *ast_destruct(ASTNode *root);

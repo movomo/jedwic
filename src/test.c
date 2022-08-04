@@ -192,7 +192,7 @@ int test_parser() {
     // Parser *parser;
     // ASTNode *node;
 
-    // gen_ast("null");
+    gen_ast("null");
     gen_ast("true");
     gen_ast("false");
 

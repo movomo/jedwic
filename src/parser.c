@@ -19,6 +19,11 @@ static ASTNode *_parser_error_memory() {
     return NULL;
 }
 
+static ASTNode *_parser_error_unknown(Token *token) {
+    fprintf(stderr, "Parser: error: unrecognized token: %s\n", token->value);
+    return NULL;
+}
+
 
 static bool _parser_eat(Parser *parser, TokenKind expected) {
     assert(parser->token != NULL);
@@ -54,6 +59,36 @@ static ASTNode *_parser_bool(Parser *parser) {
     return node;
 }
 
+static ASTNode *_parser_value(Parser *parser) {
+    ASTNode *parent = ast_construct_valuenode(parser->token);
+    ASTNode *child;
+
+    switch(parser->token->kind) {
+        case TOKEN_BOOL:
+            child = _parser_bool(parser);
+            if (!ast_append(parent, child)) {
+                return _parser_error_memory();
+            }
+            return parent;
+        case TOKEN_NULL:
+            child = _parser_null(parser);
+            if (!ast_append(parent, child)) {
+                return _parser_error_memory();
+            }
+            return parent;
+        default:
+            return _parser_error_unknown(parser->token);
+    }
+}
+
+static ASTNode *_parser_element(Parser *parser) {
+    return _parser_value(parser);
+}
+
+static ASTNode *_parser_json(Parser *parser) {
+    return _parser_element(parser);
+}
+
 
 /** Construct a parser and initialize with the first token. */
 Parser *parser_construct(Lexer *lexer) {
@@ -72,5 +107,5 @@ void parser_destruct(Parser *parser) {
 }
 
 ASTNode *parser_parse(Parser *parser) {
-    return _parser_bool(parser);
+    return _parser_json(parser);
 }
