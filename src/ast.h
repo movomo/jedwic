@@ -39,6 +39,9 @@ ASTNode *ast_construct_stringnode(Token *token);
 /** Construct an array node and return its pointer or NULL. */
 ASTNode *ast_construct_arraynode(Token *token);
 
+/** Construct an object node and return its pointer or NULL. */
+ASTNode *ast_construct_objectnode(Token *token);
+
 /** Append a child node to the parent node and report success as bool. */
 bool ast_append(ASTNode *parent, ASTNode *child);
 

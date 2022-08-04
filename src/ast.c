@@ -182,6 +182,17 @@ ASTNode *ast_construct_arraynode(Token *token) {
     return node;
 }
 
+/** Construct an object node and return its pointer or NULL. */
+ASTNode *ast_construct_objectnode(Token *token) {
+    ASTNode *node = _ast_construct(token->value, 4);
+
+    if (!node) {
+        return NULL;
+    }
+    node->kind = AST_OBJECT;
+    return node;
+}
+
 /** Recursively destruct entrie AST starting from *root*. */
 void *ast_destruct(ASTNode *root) {
     size_t i;

@@ -100,6 +100,7 @@ static ASTNode *_parser_array(Parser *parser) {
         return _parser_error_memory();
     }
     if (!_parser_eat(parser, TOKEN_OPENING_SQUARE_BRACKET)) {
+        ast_destruct_node(parent);
         return NULL;
     }
 
@@ -131,6 +132,53 @@ static ASTNode *_parser_array(Parser *parser) {
     }
 
     if (!_parser_eat(parser, TOKEN_CLOSING_SQUARE_BRACKET)) {
+        ast_destruct(parent);
+        return NULL;
+    }
+    return parent;
+}
+
+static ASTNode *_parser_object(Parser *parser) {
+    ASTNode *parent = ast_construct_objectnode(parser->token);
+    ASTNode *child;
+    Token **token = &parser->token;
+
+    if (!parent) {
+        ast_destruct_node(parent);
+        return _parser_error_memory();
+    }
+    if (!_parser_eat(parser, TOKEN_OPENING_CURLY_BRACKET)) {
+        return NULL;
+    }
+
+    if (*token && (*token)->kind != TOKEN_CLOSING_CURLY_BRACKET) {
+        if (!(child = _parser_value(parser))) {
+            ast_destruct(parent);
+            return NULL;
+        }
+        if (!ast_append(parent, child)) {
+            ast_destruct(parent);
+            return _parser_error_memory();
+        }
+
+        while (*token && (*token)->kind == TOKEN_COMMA) {
+            if (!_parser_eat(parser, TOKEN_COMMA)) {
+                ast_destruct(parent);
+                return NULL;
+            }
+
+            if (!(child = _parser_value(parser))) {
+                ast_destruct(parent);
+                return NULL;
+            }
+            if (!ast_append(parent, child)) {
+                ast_destruct(parent);
+                return _parser_error_memory();
+            }
+        }
+    }
+
+    if (!_parser_eat(parser, TOKEN_CLOSING_CURLY_BRACKET)) {
         ast_destruct(parent);
         return NULL;
     }
