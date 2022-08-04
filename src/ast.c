@@ -49,7 +49,7 @@ static void _ast_print_node(ASTNode *node, int depth) {
     depth *= AST_INDENT;
     char *name = _ast_get_node_name(node->kind);
     for (int i = 0; i < depth; i++) {
-        if (i % AST_INDENT == AST_INDENT / 2) {
+        if ((i + 2) % AST_INDENT == 0) {
             if (i == depth - 2) {
                 printf("L");
             } else {
