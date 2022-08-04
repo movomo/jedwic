@@ -206,12 +206,7 @@ void gen_ast_expect(char *code) {
     ast_destruct(node);
 }
 
-int test_parser() {
-    // Lexer *lexer;
-    // Parser *parser;
-    // ASTNode *node;
-    bool quiet = false;
-
+int test_parser(bool quiet) {
     gen_ast("null", quiet);
     gen_ast("true", quiet);
     gen_ast("false", quiet);
@@ -262,7 +257,7 @@ int main() {
         printf("Lexer tests passed.\n");
     }
 
-    if (test_parser()) {
+    if (test_parser(false)) {
         printf("Parser tests passed.\n");
     }
 
