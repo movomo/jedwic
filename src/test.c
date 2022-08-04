@@ -270,6 +270,10 @@ int test_decoder() {
     json_fencode(stdout, &jsval);
     printf("\n");
 
+    jsval = json_sdecode("\"\\u0020\\u1199\"", &error);
+    json_fencode(stdout, &jsval);
+    printf("\n");
+
     return 1;
 }
 

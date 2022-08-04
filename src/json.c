@@ -32,6 +32,12 @@ static JsonValue _json_visit_numbernode(ASTNode *node) {
     return jsval;
 }
 
+static JsonValue _json_visit_stringnode(ASTNode *node) {
+    JsonValue jsval = { JSON_STRING };
+    jsval.value.as_str = node->value;
+    return jsval;
+}
+
 static JsonValue _json_visit(ASTNode *node) {
     JsonValue jsval;
     
@@ -42,6 +48,8 @@ static JsonValue _json_visit(ASTNode *node) {
             return _json_visit_boolnode(node);
         case AST_NUMBER:
             return _json_visit_numbernode(node);
+        case AST_STRING:
+            return _json_visit_stringnode(node);
         default:
             assert(0);
             break;
@@ -67,6 +75,7 @@ static JsonValue _json_decode(Lexer *lexer, bool *error) {
     ast_destruct(root);
     return jsval;
 }
+
 
 /** Test equqlity between JsonValue.
  * Arrays and Objects are recursively tested.
@@ -163,6 +172,9 @@ JsonValue *json_fdecode(FILE *json_r) {}
 
 
 void json_fencode(FILE *stream, JsonValue *item) {
+    // size_t i;
+    // size_t len;
+    
     switch (item->type) {
         case JSON_NULL:
             fprintf(stream, "null");
@@ -174,8 +186,27 @@ void json_fencode(FILE *stream, JsonValue *item) {
             fprintf(stream, "%g", item->value.as_num);
             break;
         case JSON_STRING:
-            // todo: escaping and quoting
-            fprintf(stream, "%s", item->value.as_str);
+            char *chr = item->value.as_str;
+            fputc('"', stream);
+            while (*chr) {
+                switch (*chr) {
+                    case '"':
+                    case '\\':
+                    case '\n':
+                    case '\r':
+                    case '\t':
+                    case '\b':
+                    case '\f':
+                        fputc('\\', stream);
+                        fputc(*chr, stream);
+                        break;
+                    default:
+                        fputc(*chr, stream);
+                        break;
+                }
+                chr++;
+            }
+            fputc('"', stream);
             break;
         case JSON_ARRAY:
             fprintf(stream, "[");
