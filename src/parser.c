@@ -33,6 +33,7 @@ static bool _parser_eat(Parser *parser, TokenKind expected) {
         return true;
     } else {
         _parser_error(parser->lexer, expected, parser->token->kind);
+        token_destruct(parser->token);
         return false;
     }
 }
@@ -59,11 +60,32 @@ static ASTNode *_parser_bool(Parser *parser) {
     return node;
 }
 
+static ASTNode *_parser_number(Parser *parser) {
+    ASTNode *node = ast_construct_numbernode(parser->token);
+    if (!node) {
+        return _parser_error_memory();
+    }
+    if (!_parser_eat(parser, TOKEN_NUMBER)) {
+        return NULL;
+    }
+    return node;
+}
+
 static ASTNode *_parser_value(Parser *parser) {
-    ASTNode *parent = ast_construct_valuenode(parser->token);
+    ASTNode *parent;
     ASTNode *child;
 
+    if (!parser->token) {
+        return NULL;
+    }
+    parent = ast_construct_valuenode(parser->token);
     switch(parser->token->kind) {
+        case TOKEN_NUMBER:
+            child = _parser_number(parser);
+            if (!ast_append(parent, child)) {
+                return _parser_error_memory();
+            }
+            return parent;
         case TOKEN_BOOL:
             child = _parser_bool(parser);
             if (!ast_append(parent, child)) {

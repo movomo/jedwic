@@ -172,7 +172,7 @@ int test_lexer() {
     return 1;
 }
 
-void gen_ast(char *code) {
+void gen_ast(char *code, bool quiet) {
     Lexer *lexer;
     Parser *parser;
     ASTNode *node;
@@ -181,21 +181,47 @@ void gen_ast(char *code) {
     parser = parser_construct(lexer);
     node = parser_parse(parser);
     assert(node != NULL);
-    ast_print_tree(node);
+    if (!quiet) {
+        ast_print_tree(node);
+    }
+    assert(strcmp(node->value, code) == 0);
     lexer_destruct(lexer);
     parser_destruct(parser);
     ast_destruct(node);
+}
+
+void gen_ast_expect(char *code) {
+    Lexer *lexer;
+    Parser *parser;
+    ASTNode *node;
+
+    lexer = lexer_construct(code);
+    parser = parser_construct(lexer);
+    node = parser_parse(parser);
+    assert(node == NULL);
+    lexer_destruct(lexer);
+    parser_destruct(parser);
+    // ast_destruct(node);
 }
 
 int test_parser() {
     // Lexer *lexer;
     // Parser *parser;
     // ASTNode *node;
+    bool quiet = false;
 
-    gen_ast("null");
-    gen_ast("true");
-    gen_ast("false");
-
+    gen_ast("null", quiet);
+    gen_ast("true", quiet);
+    gen_ast("false", quiet);
+    gen_ast("-3.14", quiet);
+    gen_ast("0", quiet);
+    gen_ast("-13.0e1", quiet);
+    gen_ast("2.0E10", quiet);
+    if (!quiet) {
+        gen_ast_expect("    0000001");
+        gen_ast_expect("    3.");
+        gen_ast_expect("    3e+");
+    }
     return 1;
 }
 

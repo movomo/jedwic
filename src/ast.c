@@ -152,6 +152,17 @@ ASTNode *ast_construct_boolnode(Token *token) {
     return node;
 }
 
+/** Construct a number node and return its pointer or NULL. */
+ASTNode *ast_construct_numbernode(Token *token) {
+    ASTNode *node = _ast_construct(token->value, -1);
+
+    if (!node) {
+        return NULL;
+    }
+    node->kind = AST_NUMBER;
+    return node;
+}
+
 /** Construct a node representing a single JSON value.
  *
  * Return a pointer to the node, or NULL.
