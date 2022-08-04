@@ -180,7 +180,7 @@ void gen_ast(char *code) {
     lexer = lexer_construct(code);
     parser = parser_construct(lexer);
     node = parser_parse(parser);
-    ast_print_node(node);
+    ast_print_tree(node);
     lexer_destruct(lexer);
     parser_destruct(parser);
     ast_destruct(node);

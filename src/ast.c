@@ -30,6 +30,13 @@ static void _ast_print_node(ASTNode *node, int depth) {
     );
 }
 
+static void *_ast_print_tree(ASTNode *root, int depth) {
+    size_t i;
+    _ast_print_node(root, depth);
+    for (i = 0; i < root->len; i++) {
+        _ast_print_tree(root->children[i], depth + 1);
+    }
+}
 
 /** Construct a generic node and keep a copy of *value*. */
 static ASTNode *_ast_construct(char *value, size_t capacity) {
@@ -103,4 +110,9 @@ bool ast_append(ASTNode *parent, ASTNode *child) {}
 /** Print a single AST node. */
 void *ast_print_node(ASTNode *node) {
     _ast_print_node(node, 0);
+}
+
+/** Print entire AST. */
+void *ast_print_tree(ASTNode *root) {
+    _ast_print_tree(root, 0);
 }

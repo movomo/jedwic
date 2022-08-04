@@ -37,4 +37,7 @@ void *ast_destruct_node(ASTNode *node);
 /** Print a single AST node. */
 void *ast_print_node(ASTNode *node);
 
+/** Print entire AST. */
+void *ast_print_tree(ASTNode *root);
+
 #endif
