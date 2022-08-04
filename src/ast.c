@@ -185,20 +185,6 @@ ASTNode *ast_construct_arraynode(Token *token) {
     return node;
 }
 
-/** Construct a node representing a single JSON value.
- *
- * Return a pointer to the node, or NULL.
- */
-ASTNode *ast_construct_valuenode(Token *token) {
-    ASTNode *node = _ast_construct(token->value, 1);
-
-    if (!node) {
-        return NULL;
-    }
-    node->kind = AST_VALUE;
-    return node;
-}
-
 /** Recursively destruct entrie AST starting from *root*. */
 void *ast_destruct(ASTNode *root) {
     size_t i;
