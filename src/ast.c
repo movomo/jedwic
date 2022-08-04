@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,24 +11,61 @@
 
 #define AST_INITIAL_CAPACITY        1
 #define AST_GROW_FACTOR             2
-#define AST_INDENT                  2
+#define AST_INDENT                  4
 
+
+/** Returned string must be freed! */
+static char *_ast_get_node_name(ASTKind kind) {
+    char *name = malloc(8 * sizeof (char));
+    switch (kind) {
+        case AST_NULL:
+            strcpy(name, "Null");
+            break;
+        case AST_BOOL:
+            strcpy(name, "Bool");
+            break;
+        case AST_NUMBER:
+            strcpy(name, "Number");
+            break;
+        case AST_STRING:
+            strcpy(name, "String");
+            break;
+        case AST_ARRAY:
+            strcpy(name, "Array");
+            break;
+        case AST_OBJECT:
+            strcpy(name, "Object");
+            break;
+        case AST_VALUE:
+            strcpy(name, "Value");
+            break;
+        default:
+            assert(0);
+    }
+    return name;
+}
 
 static void _ast_print_node(ASTNode *node, int depth) {
     depth *= AST_INDENT;
+    char *name = _ast_get_node_name(node->kind);
     for (int i = 0; i < depth; i++) {
-        if (i % AST_INDENT == AST_INDENT - 1) {
-            printf("|");
+        if (i % AST_INDENT == AST_INDENT / 2) {
+            if (i == depth - 2) {
+                printf("L");
+            } else {
+                printf("|");
+            }
         } else {
             printf(" ");
         }
     }
     printf(
-        "ASTNode { .kind = %d, .value = %s, .len = %llu }\n",
-        node->kind,
+        "%sNode { .value = %s, .len = %llu }\n",
+        name,
         node->value,
         node->len
     );
+    free(name);
 }
 
 static void *_ast_print_tree(ASTNode *root, int depth) {

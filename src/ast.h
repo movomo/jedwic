@@ -9,6 +9,7 @@
 typedef enum ASTKind {
     AST_NULL,
     AST_BOOL,
+    AST_NUMBER,
     AST_STRING,
     AST_ARRAY,
     AST_OBJECT,
