@@ -224,6 +224,17 @@ int test_parser() {
     gen_ast("[ true, null, 1, \"string\", 2.68e0 ]", quiet);
     gen_ast("{}", quiet);
     gen_ast("{ \"spam\": true, \"eggs\": false }", quiet);
+    gen_ast(
+        "\
+            {\
+                \"null\": null,\
+                \"bool\": false,\
+                \"number\": [ -1.0, 0, 1.2e3, 4E5, 6.789 ],\
+                \"object\": { \"spam\": true }\
+            }\
+        ",
+        quiet
+    );
     if (!quiet) {
         gen_ast_expect("    0000001");
         gen_ast_expect("    3.");
