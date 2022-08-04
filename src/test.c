@@ -173,6 +173,10 @@ int test_lexer() {
 }
 
 void gen_ast(char *code) {
+    Lexer *lexer;
+    Parser *parser;
+    ASTNode *node;
+
     lexer = lexer_construct(code);
     parser = parser_construct(lexer);
     node = parser_parse(parser);
@@ -183,9 +187,9 @@ void gen_ast(char *code) {
 }
 
 int test_parser() {
-    Lexer *lexer;
-    Parser *parser;
-    ASTNode *node;
+    // Lexer *lexer;
+    // Parser *parser;
+    // ASTNode *node;
 
     gen_ast("null");
 
