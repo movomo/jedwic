@@ -191,14 +191,34 @@ void json_fencode(FILE *stream, JsonValue *item) {
             while (*chr) {
                 switch (*chr) {
                     case '"':
+                        fputc('\\', stream);
+                        fputc('"', stream);
+                        break;
                     case '\\':
+                        fputc('\\', stream);
+                        if (!(*(chr + 1) == 'u')) {
+                            fputc('\\', stream);
+                        }
+                        break;
                     case '\n':
+                        fputc('\\', stream);
+                        fputc('n', stream);
+                        break;
                     case '\r':
+                        fputc('\\', stream);
+                        fputc('r', stream);
+                        break;
                     case '\t':
+                        fputc('\\', stream);
+                        fputc('t', stream);
+                        break;
                     case '\b':
+                        fputc('\\', stream);
+                        fputc('b', stream);
+                        break;
                     case '\f':
                         fputc('\\', stream);
-                        fputc(*chr, stream);
+                        fputc('f', stream);
                         break;
                     default:
                         fputc(*chr, stream);
