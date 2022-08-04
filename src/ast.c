@@ -36,9 +36,6 @@ static char *_ast_get_node_name(ASTKind kind) {
         case AST_OBJECT:
             strcpy(name, "Object");
             break;
-        case AST_VALUE:
-            strcpy(name, "Value");
-            break;
         default:
             assert(0);
     }
