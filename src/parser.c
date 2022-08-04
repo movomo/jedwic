@@ -43,6 +43,17 @@ static ASTNode *_parser_null(Parser *parser) {
     return node;
 }
 
+static ASTNode *_parser_bool(Parser *parser) {
+    ASTNode *node = ast_construct_boolnode(parser->token);
+    if (!node) {
+        return _parser_error_memory();
+    }
+    if (!_parser_eat(parser, TOKEN_BOOL)) {
+        return NULL;
+    }
+    return node;
+}
+
 
 /** Construct a parser and initialize with the first token. */
 Parser *parser_construct(Lexer *lexer) {
@@ -61,5 +72,5 @@ void parser_destruct(Parser *parser) {
 }
 
 ASTNode *parser_parse(Parser *parser) {
-    return _parser_null(parser);
+    return _parser_bool(parser);
 }

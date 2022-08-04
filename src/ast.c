@@ -23,7 +23,7 @@ static void _ast_print_node(ASTNode *node, int depth) {
         }
     }
     printf(
-        "ASTNode { .kind=%d, .value=%s, .len=%llu }\n",
+        "ASTNode { .kind = %d, .value = %s, .len = %llu }\n",
         node->kind,
         node->value,
         node->len
