@@ -271,7 +271,10 @@ int test_decoder() {
     printf("\n");
 
     jsval = json_sdecode("\"spam\\u0020eggs\\n\\\"ham\\\"\\tjam\"", &error);
-    printf("%s\n", jsval.value.as_str);
+    json_fencode(stdout, &jsval);
+    printf("\n");
+
+    jsval = json_sdecode("[1, 2, 3, 4, 5]", &error);
     json_fencode(stdout, &jsval);
     printf("\n");
 

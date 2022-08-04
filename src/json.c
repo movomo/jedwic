@@ -38,6 +38,21 @@ static JsonValue _json_visit_stringnode(ASTNode *node) {
     return jsval;
 }
 
+static JsonValue _json_visit_arraynode(ASTNode *node) {
+    JsonValue jsval = { JSON_ARRAY };
+    JsonValue val;
+    JsonArray *arr;
+    size_t i;
+    
+    jsval.value.as_arr = jsonarr_construct(node->len);
+    arr = jsval.value.as_arr;
+    for (i = 0; i < node->len; i++) {
+        val = _json_visit(node->children[i]);
+        jsonarr_append(arr, &val);
+    }
+    return jsval;
+}
+
 static JsonValue _json_visit(ASTNode *node) {
     JsonValue jsval;
     
@@ -50,6 +65,8 @@ static JsonValue _json_visit(ASTNode *node) {
             return _json_visit_numbernode(node);
         case AST_STRING:
             return _json_visit_stringnode(node);
+        case AST_ARRAY:
+            return _json_visit_arraynode(node);
         default:
             assert(0);
             break;
@@ -172,8 +189,8 @@ JsonValue *json_fdecode(FILE *json_r) {}
 
 
 void json_fencode(FILE *stream, JsonValue *item) {
-    // size_t i;
-    // size_t len;
+    size_t i;
+    size_t len;
     
     switch (item->type) {
         case JSON_NULL:
@@ -229,9 +246,21 @@ void json_fencode(FILE *stream, JsonValue *item) {
             fputc('"', stream);
             break;
         case JSON_ARRAY:
-            fprintf(stream, "[");
+            JsonArray *arr = item->value.as_arr;
+            
+            fputc('[', stream);
+            len = arr->len;
+            for (i = 0; i < len; i++) {
+                if (i) {
+                    fputc(',', stream);
+                }
+                json_fencode(stream, jsonarr_getitem(arr, i));
+            }
+            fputc(']', stream);
             break;
         case JSON_OBJECT:
+            fputc('{', stream);
+            fputc('}', stream);
             break;
     }
 }
