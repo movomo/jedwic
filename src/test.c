@@ -172,19 +172,23 @@ int test_lexer() {
     return 1;
 }
 
-int test_parser() {
-    Lexer *lexer;
-    Parser *parser;
-    ASTNode *node;
-    
-    lexer = lexer_construct("null");
+void gen_ast(char *code) {
+    lexer = lexer_construct(code);
     parser = parser_construct(lexer);
     node = parser_parse(parser);
     ast_print_node(node);
     lexer_destruct(lexer);
     parser_destruct(parser);
     ast_destruct(node);
-    
+}
+
+int test_parser() {
+    Lexer *lexer;
+    Parser *parser;
+    ASTNode *node;
+
+    gen_ast("null");
+
     return 1;
 }
 
