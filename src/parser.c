@@ -292,7 +292,10 @@ Parser *parser_construct(Lexer *lexer) {
     return parser;
 }
 
-/** Destruct parser, but not the lexer. */
+/** Destruct parser, but not the lexer.
+ *
+ * Last token needs to be destroyed manually if parsing didn't error out.
+ */
 void parser_destruct(Parser *parser) {
     free(parser);
 }

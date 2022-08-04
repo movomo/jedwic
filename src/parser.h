@@ -14,7 +14,10 @@ typedef struct Parser {
 /** Construct a parser and initialize with the first token. */
 Parser *parser_construct(Lexer *lexer);
 
-/** Destruct parser, but not the lexer. */
+/** Destruct parser, but not the lexer.
+ *
+ * Last token needs to be destroyed manually if parsing didn't error out.
+ */
 void parser_destruct(Parser *parser);
 
 ASTNode *parser_parse(Parser *parser);

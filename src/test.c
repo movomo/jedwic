@@ -188,6 +188,7 @@ void gen_ast(char *code, bool quiet) {
         assert(strcmp(node->value, code) == 0);
     }
     lexer_destruct(lexer);
+    token_destruct(parser->token);
     parser_destruct(parser);
     ast_destruct(node);
 }
@@ -258,7 +259,7 @@ int main() {
         printf("Lexer tests passed.\n");
     }
 
-    if (test_parser(false)) {
+    if (test_parser(true)) {
         printf("Parser tests passed.\n");
     }
 
