@@ -240,7 +240,7 @@ int test_parser(bool quiet) {
         gen_ast_expect("{[]}");
         gen_ast_expect("{ \"foo\": { }");
         gen_ast_expect("{ \"foo\": \"bar\", }");
-        gen_ast_expect("{ \"foo\": \n\"bar\", \"baz\" }");
+        gen_ast_expect("{ \n\n\"foo\": \"bar\", \"baz\" }");
     }
     return 1;
 }
