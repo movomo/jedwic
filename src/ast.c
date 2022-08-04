@@ -132,7 +132,7 @@ static bool _ast_grow(ASTNode *node) {
 
 /** Construct a null node and return its pointer or NULL. */
 ASTNode *ast_construct_nullnode(Token *token) {
-    ASTNode *node = _ast_construct(token->value, -1);
+    ASTNode *node = _ast_construct(token->value, 0);
 
     if (!node) {
         return NULL;
@@ -143,7 +143,7 @@ ASTNode *ast_construct_nullnode(Token *token) {
 
 /** Construct a true/false node and return its pointer or NULL. */
 ASTNode *ast_construct_boolnode(Token *token) {
-    ASTNode *node = _ast_construct(token->value, -1);
+    ASTNode *node = _ast_construct(token->value, 0);
 
     if (!node) {
         return NULL;
@@ -154,12 +154,23 @@ ASTNode *ast_construct_boolnode(Token *token) {
 
 /** Construct a number node and return its pointer or NULL. */
 ASTNode *ast_construct_numbernode(Token *token) {
-    ASTNode *node = _ast_construct(token->value, -1);
+    ASTNode *node = _ast_construct(token->value, 0);
 
     if (!node) {
         return NULL;
     }
     node->kind = AST_NUMBER;
+    return node;
+}
+
+/** Construct a string node and return its pointer or NULL. */
+ASTNode *ast_construct_stringnode(Token *token) {
+    ASTNode *node = _ast_construct(token->value, 0);
+
+    if (!node) {
+        return NULL;
+    }
+    node->kind = AST_STRING;
     return node;
 }
 

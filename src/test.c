@@ -184,7 +184,9 @@ void gen_ast(char *code, bool quiet) {
     if (!quiet) {
         ast_print_tree(node);
     }
-    assert(strcmp(node->value, code) == 0);
+    if (node->kind < AST_STRING) {
+        assert(strcmp(node->value, code) == 0);
+    }
     lexer_destruct(lexer);
     parser_destruct(parser);
     ast_destruct(node);
@@ -217,10 +219,12 @@ int test_parser() {
     gen_ast("0", quiet);
     gen_ast("-13.0e1", quiet);
     gen_ast("2.0E10", quiet);
+    gen_ast("\"I will say \\\"Ni!\\\" again to you\"", quiet);
     if (!quiet) {
         gen_ast_expect("    0000001");
         gen_ast_expect("    3.");
         gen_ast_expect("    3e+");
+        gen_ast_expect("\"if you don't appease us.");
     }
     return 1;
 }

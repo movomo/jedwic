@@ -71,6 +71,17 @@ static ASTNode *_parser_number(Parser *parser) {
     return node;
 }
 
+static ASTNode *_parser_string(Parser *parser) {
+    ASTNode *node = ast_construct_stringnode(parser->token);
+    if (!node) {
+        return _parser_error_memory();
+    }
+    if (!_parser_eat(parser, TOKEN_STRING)) {
+        return NULL;
+    }
+    return node;
+}
+
 static ASTNode *_parser_value(Parser *parser) {
     ASTNode *parent;
     ASTNode *child;
@@ -80,6 +91,12 @@ static ASTNode *_parser_value(Parser *parser) {
     }
     parent = ast_construct_valuenode(parser->token);
     switch(parser->token->kind) {
+        case TOKEN_STRING:
+            child = _parser_string(parser);
+            if (!ast_append(parent, child)) {
+                return _parser_error_memory();
+            }
+            return parent;
         case TOKEN_NUMBER:
             child = _parser_number(parser);
             if (!ast_append(parent, child)) {
