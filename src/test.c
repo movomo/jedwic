@@ -220,11 +220,15 @@ int test_parser() {
     gen_ast("-13.0e1", quiet);
     gen_ast("2.0E10", quiet);
     gen_ast("\"I will say \\\"Ni!\\\" again to you\"", quiet);
+    gen_ast("[]", quiet);
+    gen_ast("[ true, null, 1, \"string\" ]", quiet);
     if (!quiet) {
         gen_ast_expect("    0000001");
         gen_ast_expect("    3.");
         gen_ast_expect("    3e+");
         gen_ast_expect("\"if you don't appease us.");
+        gen_ast_expect("[ nil, ]");     // Must be Lexer error
+        gen_ast_expect("[ 0.0, ]");
     }
     return 1;
 }

@@ -9,25 +9,29 @@
 #include "token.h"
 
 
+static ASTNode *_parser_value(Parser *parser);
+
+
 static ASTNode *_parser_error(Lexer *lexer, TokenKind expected, TokenKind got) {
-    fprintf(stderr, "Parser: error:\n");
+    fprintf(stderr, "\nParser: error:\n");
     return NULL;
 }
 
 static ASTNode *_parser_error_memory() {
-    fprintf(stderr, "Parser: insufficient memory\n");
+    fprintf(stderr, "\nParser: insufficient memory\n");
     return NULL;
 }
 
-static ASTNode *_parser_error_unknown(Token *token) {
-    fprintf(stderr, "Parser: error: unrecognized token: %s\n", token->value);
+static ASTNode *_parser_error_unexpected(Token *token) {
+    fprintf(stderr, "\nParser: error: unexpected token: %s\n", token->value);
     return NULL;
 }
 
 
 static bool _parser_eat(Parser *parser, TokenKind expected) {
-    assert(parser->token != NULL);
-    if (parser->token->kind == expected) {
+    if (!parser->token) {
+        return false;
+    } else if (parser->token->kind == expected) {
         token_destruct(parser->token);
         parser->token = lexer_next(parser->lexer);
         return true;
@@ -44,6 +48,7 @@ static ASTNode *_parser_null(Parser *parser) {
         return _parser_error_memory();
     }
     if (!_parser_eat(parser, TOKEN_NULL)) {
+        ast_destruct_node(node);
         return NULL;
     }
     return node;
@@ -55,6 +60,7 @@ static ASTNode *_parser_bool(Parser *parser) {
         return _parser_error_memory();
     }
     if (!_parser_eat(parser, TOKEN_BOOL)) {
+        ast_destruct_node(node);
         return NULL;
     }
     return node;
@@ -66,6 +72,7 @@ static ASTNode *_parser_number(Parser *parser) {
         return _parser_error_memory();
     }
     if (!_parser_eat(parser, TOKEN_NUMBER)) {
+        ast_destruct_node(node);
         return NULL;
     }
     return node;
@@ -77,9 +84,58 @@ static ASTNode *_parser_string(Parser *parser) {
         return _parser_error_memory();
     }
     if (!_parser_eat(parser, TOKEN_STRING)) {
+        ast_destruct_node(node);
         return NULL;
     }
     return node;
+}
+
+static ASTNode *_parser_array(Parser *parser) {
+    ASTNode *parent = ast_construct_arraynode(parser->token);
+    ASTNode *child;
+    Token **token = &parser->token;
+
+    if (!parent) {
+        ast_destruct_node(parent);
+        return _parser_error_memory();
+    }
+    if (!_parser_eat(parser, TOKEN_OPENING_SQUARE_BRACKET)) {
+        return NULL;
+    }
+
+    if (*token && (*token)->kind != TOKEN_CLOSING_SQUARE_BRACKET) {
+        token_print(*token);
+        if (!(child = _parser_value(parser))) {
+            ast_destruct(parent);
+            return NULL;
+        }
+        if (!ast_append(parent, child)) {
+            ast_destruct(parent);
+            return _parser_error_memory();
+        }
+
+        while (*token && (*token)->kind == TOKEN_COMMA) {
+            if (!_parser_eat(parser, TOKEN_COMMA)) {
+                ast_destruct(parent);
+                return NULL;
+            }
+
+            if (!(child = _parser_value(parser))) {
+                ast_destruct(parent);
+                return NULL;
+            }
+            if (!ast_append(parent, child)) {
+                ast_destruct(parent);
+                return _parser_error_memory();
+            }
+        }
+    }
+
+    if (!_parser_eat(parser, TOKEN_CLOSING_SQUARE_BRACKET)) {
+        ast_destruct(parent);
+        return NULL;
+    }
+    return parent;
 }
 
 static ASTNode *_parser_value(Parser *parser) {
@@ -97,14 +153,22 @@ static ASTNode *_parser_value(Parser *parser) {
                 return _parser_error_memory();
             }
             return parent;
+        case TOKEN_BOOL:
+            child = _parser_bool(parser);
+            if (!ast_append(parent, child)) {
+                return _parser_error_memory();
+            }
+            return parent;
         case TOKEN_NUMBER:
             child = _parser_number(parser);
             if (!ast_append(parent, child)) {
                 return _parser_error_memory();
             }
             return parent;
-        case TOKEN_BOOL:
-            child = _parser_bool(parser);
+        case TOKEN_OPENING_SQUARE_BRACKET:
+            if (!(child = _parser_array(parser))) {
+                return NULL;
+            }
             if (!ast_append(parent, child)) {
                 return _parser_error_memory();
             }
@@ -116,7 +180,7 @@ static ASTNode *_parser_value(Parser *parser) {
             }
             return parent;
         default:
-            return _parser_error_unknown(parser->token);
+            return _parser_error_unexpected(parser->token);
     }
 }
 

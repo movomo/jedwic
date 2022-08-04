@@ -37,6 +37,9 @@ ASTNode *ast_construct_numbernode(Token *token);
 /** Construct a string node and return its pointer or NULL. */
 ASTNode *ast_construct_stringnode(Token *token);
 
+/** Construct an array node and return its pointer or NULL. */
+ASTNode *ast_construct_arraynode(Token *token);
+
 /** Construct a node representing a single JSON value.
  *
  * Return a pointer to the node, or NULL.
