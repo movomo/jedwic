@@ -28,5 +28,13 @@ ASTNode *ast_construct_nullnode(Token *token);
 /** Construct a true/false node and return its pointer or NULL. */
 ASTNode *ast_construct_boolnode(Token *token);
 
+/** Recursively destruct entrie AST starting from *root*. */
+void *ast_destruct(ASTNode *root);
+
+/** Destruct a single AST node as well as textual values. */
+void *ast_destruct_node(ASTNode *node);
+
+/** Print a single AST node. */
+void *ast_print_node(ASTNode *node);
 
 #endif

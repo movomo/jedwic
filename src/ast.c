@@ -10,6 +10,25 @@
 
 #define AST_INITIAL_CAPACITY        1
 #define AST_GROW_FACTOR             2
+#define AST_INDENT                  2
+
+
+static void _ast_print_node(ASTNode *node, int depth) {
+    depth *= AST_INDENT;
+    for (int i = 0; i < depth; i++) {
+        if (i % AST_INDENT == AST_INDENT - 1) {
+            printf("|");
+        } else {
+            printf(" ");
+        }
+    }
+    printf(
+        "ASTNode { .kind=%d, .value=%s, .len=%llu }\n",
+        node->kind,
+        node->value,
+        node->len
+    );
+}
 
 
 /** Construct a generic node and keep a copy of *value*. */
@@ -63,10 +82,25 @@ ASTNode *ast_construct_boolnode(Token *token) {
     return node;
 }
 
-void *ast_destruct(ASTNode *root) {}
+/** Recursively destruct entrie AST starting from *root*. */
+void *ast_destruct(ASTNode *root) {
+    size_t i;
+    for (i = 0; i < root->len; i++) {
+        ast_destruct(root->children[i]);
+    }
+    ast_destruct_node(root);
+}
 
-void *ast_destruct_node(ASTNode *node) {}
+/** Destruct a single AST node as well as textual values. */
+void *ast_destruct_node(ASTNode *node) {
+    free(node->value);
+    free(node->children);
+    free(node);
+}
 
 bool ast_append(ASTNode *parent, ASTNode *child) {}
 
-void *ast_print(ASTNode *node) {}
+/** Print a single AST node. */
+void *ast_print_node(ASTNode *node) {
+    _ast_print_node(node, 0);
+}

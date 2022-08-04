@@ -6,7 +6,10 @@
 #include "json.h"
 #include "jsonarr.h"
 #include "jsonobj.h"
+#include "token.h"
+#include "ast.h"
 #include "lexer.h"
+#include "parser.h"
 
 
 #define NSAMPLES        8
@@ -169,6 +172,21 @@ int test_lexer() {
     return 1;
 }
 
+int test_parser() {
+    Lexer *lexer;
+    Parser *parser;
+    ASTNode *node;
+    
+    lexer = lexer_construct("null");
+    parser = parser_construct(lexer);
+    node = parser_parse(parser);
+    ast_print_node(node);
+    lexer_destruct(lexer);
+    parser_destruct(parser);
+    ast_destruct(node);
+    
+    return 1;
+}
 
 int main() {
     if (test_arr()) {
@@ -181,6 +199,10 @@ int main() {
 
     if (test_lexer()) {
         printf("Lexer tests passed.\n");
+    }
+
+    if (test_parser()) {
+        printf("Parser tests passed.\n");
     }
 
     return 0;
