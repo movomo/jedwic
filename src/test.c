@@ -222,6 +222,8 @@ int test_parser() {
     gen_ast("\"I will say \\\"Ni!\\\" again to you\"", quiet);
     gen_ast("[]", quiet);
     gen_ast("[ true, null, 1, \"string\", 2.68e0 ]", quiet);
+    gen_ast("{}", quiet);
+    gen_ast("{ \"spam\": true, \"eggs\": false }", quiet);
     if (!quiet) {
         gen_ast_expect("    0000001");
         gen_ast_expect("    3.");

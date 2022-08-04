@@ -138,6 +138,7 @@ static ASTNode *_parser_array(Parser *parser) {
 }
 
 static ASTNode *_parser_member(Parser *parser) {
+    // key
     ASTNode *parent = ast_construct_membernode(parser->token);
     ASTNode *child = ast_construct_stringnode(parser->token);
 
@@ -156,7 +157,15 @@ static ASTNode *_parser_member(Parser *parser) {
         ast_destruct_node(child);
         return _parser_error_memory();
     }
+    
+    // colon
+    if (!_parser_eat(parser, TOKEN_COLON)) {
+        ast_destruct_node(parent);
+        ast_destruct_node(child);
+        return NULL;
+    }
 
+    // value
     if (!(child = _parser_value(parser))) {
         ast_destruct_node(parent);
         ast_destruct_node(child);
@@ -184,7 +193,7 @@ static ASTNode *_parser_object(Parser *parser) {
     }
 
     if (*token && (*token)->kind != TOKEN_CLOSING_CURLY_BRACKET) {
-        if (!(child = _parser_value(parser))) {
+        if (!(child = _parser_member(parser))) {
             ast_destruct(parent);
             return NULL;
         }
@@ -199,7 +208,7 @@ static ASTNode *_parser_object(Parser *parser) {
                 return NULL;
             }
 
-            if (!(child = _parser_value(parser))) {
+            if (!(child = _parser_member(parser))) {
                 ast_destruct(parent);
                 return NULL;
             }
@@ -232,6 +241,8 @@ static ASTNode *_parser_value(Parser *parser) {
             return _parser_number(parser);
         case TOKEN_OPENING_SQUARE_BRACKET:
             return _parser_array(parser);
+        case TOKEN_OPENING_CURLY_BRACKET:
+            return _parser_object(parser);
         case TOKEN_NULL:
             return _parser_null(parser);
         default:
