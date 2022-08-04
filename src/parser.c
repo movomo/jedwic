@@ -152,7 +152,6 @@ static ASTNode *_parser_key(Parser *parser) {
     // colon
     if (!_parser_eat(parser, TOKEN_COLON)) {
         ast_destruct_node(parent);
-        ast_destruct_node(child);
         return NULL;
     }
 

@@ -231,6 +231,9 @@ int test_parser() {
         gen_ast_expect("\"if you don't appease us.");
         gen_ast_expect("[ nil, ]");     // Must be Lexer error
         gen_ast_expect("[ 0.0, ]");
+        gen_ast_expect("{[]}");
+        gen_ast_expect("{ \"foo\": \"bar\", }");
+        gen_ast_expect("{ \"foo\": \"bar\", \"baz\" }");
     }
     return 1;
 }
