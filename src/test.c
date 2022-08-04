@@ -238,8 +238,9 @@ int test_parser(bool quiet) {
         gen_ast_expect("[ nil, ]");     // Must be Lexer error
         gen_ast_expect("[ 0.0, ]");
         gen_ast_expect("{[]}");
+        gen_ast_expect("{ \"foo\": { }");
         gen_ast_expect("{ \"foo\": \"bar\", }");
-        gen_ast_expect("{ \"foo\": \"bar\", \"baz\" }");
+        gen_ast_expect("{ \"foo\": \n\"bar\", \"baz\" }");
     }
     return 1;
 }

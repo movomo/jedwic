@@ -13,7 +13,39 @@ static ASTNode *_parser_value(Parser *parser);
 
 
 static ASTNode *_parser_error(Lexer *lexer, TokenKind expected, TokenKind got) {
-    fprintf(stderr, "\nParser: error:\n");
+    char *p = &lexer->text[lexer->line_start];
+    // Lexer has already advanced, so we subtract 1.
+    size_t len = lexer->pos - lexer->line_start - 1;
+    size_t pos;
+    size_t pos_oneth;
+
+    fprintf(
+        stderr,
+        "\nParser: error: expected '%c', got '%c' (line %llu, pos %llu)\n",
+        expected,
+        got,
+        lexer->line,
+        len
+    );
+
+    do {
+        fprintf(stderr, "%c", *p++);
+    } while (*p != '\n' && *p);
+    fprintf(stderr, "\n");
+    // Super helpful error indicator!
+    for (pos = 0; pos < len; pos++) {
+        if (pos % 10) {
+            fprintf(stderr, "_");
+        } else {
+            pos_oneth = pos / 10;
+            while (pos_oneth >= 10) {
+                pos_oneth /= 10;
+            }
+            fprintf(stderr, "%llu", pos_oneth);
+        }
+    }
+    fprintf(stderr, "^\n");
+
     return NULL;
 }
 

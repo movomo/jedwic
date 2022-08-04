@@ -31,7 +31,7 @@ Token *_lexer_error(Lexer *lexer, char *msg) {
     fprintf(stderr, "\nLexer: error: ");
     fprintf(
         stderr,
-        "%s (line %llu, pos %llu)\n\n",
+        "%s (line %llu, pos %llu)\n",
         msg,
         lexer->line,
         len
@@ -42,9 +42,6 @@ Token *_lexer_error(Lexer *lexer, char *msg) {
     } while (*p != '\n' && *p);
     fprintf(stderr, "\n");
     // Super helpful error indicator!
-    // while (len--) {
-        // fprintf(stderr, "-");
-    // }
     for (pos = 0; pos < len; pos++) {
         if (pos % 10) {
             fprintf(stderr, "_");

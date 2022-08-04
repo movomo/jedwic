@@ -37,17 +37,6 @@ void token_destruct(Token *token) {
 void token_print(Token *token) {
     printf("Token { kind: ");
     switch (token->kind) {
-        // May be removed
-        case TOKEN_MINUS:
-            printf("MINUS");
-            break;
-        case TOKEN_PLUS:
-            printf("PLUS");
-            break;
-        case TOKEN_DOUBLEQUOTE:
-            printf("DOUBLEQUOTE");
-            break;
-        //
         case TOKEN_EOF:
             printf("EOF");
             break;
