@@ -138,8 +138,7 @@ Token *_lexer_string(Lexer *lexer) {
         return NULL;
     }
 
- // * escape: '"' | '\' | '/' | 'b' | 'f' | 'n' | 'r' | 't' | 'u' hex hex hex hex
-    while (*chr && (*chr != '"' || esc)) {
+    while (*chr >= 0x20 && (*chr != '"' || esc)) {
         if (esc) {
             esc = false;
             switch (*chr) {
