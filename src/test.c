@@ -278,6 +278,10 @@ int test_decoder() {
     json_fencode(stdout, &jsval);
     printf("\n");
 
+    jsval = json_sdecode("{\"a\": 1, \"b\": 2, \"c\": 3}", &error);
+    json_fencode(stdout, &jsval);
+    printf("\n");
+
     return 1;
 }
 

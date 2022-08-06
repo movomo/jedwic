@@ -43,7 +43,7 @@ static JsonValue _json_visit_arraynode(ASTNode *node) {
     JsonValue val;
     JsonArray *arr;
     size_t i;
-    
+
     jsval.value.as_arr = jsonarr_construct(node->len);
     arr = jsval.value.as_arr;
     for (i = 0; i < node->len; i++) {
@@ -53,9 +53,31 @@ static JsonValue _json_visit_arraynode(ASTNode *node) {
     return jsval;
 }
 
+static JsonValue _json_visit_keynode(ASTNode *node, char **key) {
+    JsonValue jsval = _json_visit(node->children[0]);
+    *key = node->value;
+    return jsval;
+}
+
+static JsonValue _json_visit_objectnode(ASTNode *node) {
+    JsonValue jsval = { JSON_OBJECT };
+    JsonValue val;
+    JsonObject *obj;
+    size_t i;
+    char *key;
+
+    jsval.value.as_obj = jsonobj_construct(json_default_hasher, node->len);
+    obj = jsval.value.as_obj;
+    for (i = 0; i < node->len; i++) {
+        val = _json_visit_keynode(node->children[i], &key);
+        jsonobj_setitem(obj, key, &val);
+    }
+    return jsval;
+}
+
 static JsonValue _json_visit(ASTNode *node) {
     JsonValue jsval;
-    
+
     switch (node->kind) {
         case AST_NULL:
             return _json_visit_nullnode(node);
@@ -67,11 +89,59 @@ static JsonValue _json_visit(ASTNode *node) {
             return _json_visit_stringnode(node);
         case AST_ARRAY:
             return _json_visit_arraynode(node);
+        case AST_OBJECT:
+            return _json_visit_objectnode(node);
         default:
             assert(0);
             break;
     }
 }
+
+static void _json_fencode_string(FILE *stream, char *string) {
+    char *chr = string;
+
+    fputc('"', stream);
+    while (*chr) {
+        switch (*chr) {
+            case '"':
+                fputc('\\', stream);
+                fputc('"', stream);
+                break;
+            case '\\':
+                fputc('\\', stream);
+                if (!(*(chr + 1) == 'u')) {
+                    fputc('\\', stream);
+                }
+                break;
+            case '\n':
+                fputc('\\', stream);
+                fputc('n', stream);
+                break;
+            case '\r':
+                fputc('\\', stream);
+                fputc('r', stream);
+                break;
+            case '\t':
+                fputc('\\', stream);
+                fputc('t', stream);
+                break;
+            case '\b':
+                fputc('\\', stream);
+                fputc('b', stream);
+                break;
+            case '\f':
+                fputc('\\', stream);
+                fputc('f', stream);
+                break;
+            default:
+                fputc(*chr, stream);
+                break;
+        }
+        chr++;
+    }
+    fputc('"', stream);
+}
+
 
 static JsonValue _json_decode(Lexer *lexer, bool *error) {
     Parser *parser = parser_construct(lexer);
@@ -191,7 +261,7 @@ JsonValue *json_fdecode(FILE *json_r) {}
 void json_fencode(FILE *stream, JsonValue *item) {
     size_t i;
     size_t len;
-    
+
     switch (item->type) {
         case JSON_NULL:
             fprintf(stream, "null");
@@ -203,51 +273,11 @@ void json_fencode(FILE *stream, JsonValue *item) {
             fprintf(stream, "%g", item->value.as_num);
             break;
         case JSON_STRING:
-            char *chr = item->value.as_str;
-            fputc('"', stream);
-            while (*chr) {
-                switch (*chr) {
-                    case '"':
-                        fputc('\\', stream);
-                        fputc('"', stream);
-                        break;
-                    case '\\':
-                        fputc('\\', stream);
-                        if (!(*(chr + 1) == 'u')) {
-                            fputc('\\', stream);
-                        }
-                        break;
-                    case '\n':
-                        fputc('\\', stream);
-                        fputc('n', stream);
-                        break;
-                    case '\r':
-                        fputc('\\', stream);
-                        fputc('r', stream);
-                        break;
-                    case '\t':
-                        fputc('\\', stream);
-                        fputc('t', stream);
-                        break;
-                    case '\b':
-                        fputc('\\', stream);
-                        fputc('b', stream);
-                        break;
-                    case '\f':
-                        fputc('\\', stream);
-                        fputc('f', stream);
-                        break;
-                    default:
-                        fputc(*chr, stream);
-                        break;
-                }
-                chr++;
-            }
-            fputc('"', stream);
+            _json_fencode_string(stream, item->value.as_str);
             break;
         case JSON_ARRAY:
             JsonArray *arr = item->value.as_arr;
-            
+
             fputc('[', stream);
             len = arr->len;
             for (i = 0; i < len; i++) {
@@ -259,7 +289,18 @@ void json_fencode(FILE *stream, JsonValue *item) {
             fputc(']', stream);
             break;
         case JSON_OBJECT:
+            JsonObject *obj = item->value.as_obj;
+            JsonObjectIterator *iter = jsonobj_iter(obj);
+
             fputc('{', stream);
+            while (jsonobj_next(iter)) {
+                if (iter->index) {
+                    fputc(',', stream);
+                }
+                _json_fencode_string(stream, iter->key);
+                fputc(':', stream);
+                json_fencode(stream, iter->value);
+            }
             fputc('}', stream);
             break;
     }
