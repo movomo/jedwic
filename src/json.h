@@ -92,7 +92,8 @@ bool jsonval_equal(JsonValue *a, JsonValue *b);
  */
 JsonValue json_sdecode(char *text, bool *error);
 
-void json_fencode(FILE *stream, JsonValue *item);
+/** Output JsonValue object to file, with optional formatting. */
+void json_fencode(FILE *stream, JsonValue *item, bool pretty);
 
 /** Implements 32-bit FNV-1a hash algorithm. Expects string as input.*/
 JsonObjectKeyHash json_default_hasher(void *data);

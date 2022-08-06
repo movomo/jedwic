@@ -97,6 +97,7 @@ static JsonValue _json_visit(ASTNode *node) {
     }
 }
 
+
 static void _json_fencode_string(FILE *stream, char *string) {
     char *chr = string;
 
@@ -140,6 +141,76 @@ static void _json_fencode_string(FILE *stream, char *string) {
         chr++;
     }
     fputc('"', stream);
+}
+
+static inline void _json_fencode_newline(
+    FILE *stream, bool pretty, unsigned int depth
+) {
+    if (pretty) {
+        fputc('\n', stream);
+
+        depth *= 4;
+        while (depth--) {
+            fputc(' ', stream);
+        }
+    }
+}
+
+static void _json_fencode(
+    FILE *stream, JsonValue *item, bool pretty, unsigned int depth
+) {
+    size_t i;
+    size_t len;
+
+    switch (item->type) {
+        case JSON_NULL:
+            fprintf(stream, "null");
+            break;
+        case JSON_BOOL:
+            fprintf(stream, "%s", (item->value.as_bool) ? "true" : "false");
+            break;
+        case JSON_NUMBER:
+            fprintf(stream, "%g", item->value.as_num);
+            break;
+        case JSON_STRING:
+            _json_fencode_string(stream, item->value.as_str);
+            break;
+        case JSON_ARRAY:
+            JsonArray *arr = item->value.as_arr;
+
+            fputc('[', stream);
+            len = arr->len;
+            for (i = 0; i < len; i++) {
+                if (i) {
+                    fputc(',', stream);
+                }
+                _json_fencode_newline(stream, pretty, depth + 1);
+                _json_fencode(stream, jsonarr_getitem(arr, i), pretty, depth + 1);
+            }
+            _json_fencode_newline(stream, pretty, depth);
+            fputc(']', stream);
+            break;
+        case JSON_OBJECT:
+            JsonObject *obj = item->value.as_obj;
+            JsonObjectIterator *iter = jsonobj_iter(obj);
+
+            fputc('{', stream);
+            while (jsonobj_next(iter)) {
+                if (iter->index) {
+                    fputc(',', stream);
+                }
+                _json_fencode_newline(stream, pretty, depth + 1);
+                _json_fencode_string(stream, iter->key);
+                fputc(':', stream);
+                if (pretty) {
+                        fputc(' ', stream);
+                }
+                _json_fencode(stream, iter->value, pretty, depth + 1);
+            }
+            _json_fencode_newline(stream, pretty, depth);
+            fputc('}', stream);
+            break;
+    }
 }
 
 
@@ -258,50 +329,7 @@ JsonValue json_sdecode(char *text, bool *error) {
 JsonValue *json_fdecode(FILE *json_r) {}
 
 
-void json_fencode(FILE *stream, JsonValue *item) {
-    size_t i;
-    size_t len;
-
-    switch (item->type) {
-        case JSON_NULL:
-            fprintf(stream, "null");
-            break;
-        case JSON_BOOL:
-            fprintf(stream, "%s", (item->value.as_bool) ? "true" : "false");
-            break;
-        case JSON_NUMBER:
-            fprintf(stream, "%g", item->value.as_num);
-            break;
-        case JSON_STRING:
-            _json_fencode_string(stream, item->value.as_str);
-            break;
-        case JSON_ARRAY:
-            JsonArray *arr = item->value.as_arr;
-
-            fputc('[', stream);
-            len = arr->len;
-            for (i = 0; i < len; i++) {
-                if (i) {
-                    fputc(',', stream);
-                }
-                json_fencode(stream, jsonarr_getitem(arr, i));
-            }
-            fputc(']', stream);
-            break;
-        case JSON_OBJECT:
-            JsonObject *obj = item->value.as_obj;
-            JsonObjectIterator *iter = jsonobj_iter(obj);
-
-            fputc('{', stream);
-            while (jsonobj_next(iter)) {
-                if (iter->index) {
-                    fputc(',', stream);
-                }
-                _json_fencode_string(stream, iter->key);
-                fputc(':', stream);
-                json_fencode(stream, iter->value);
-            }
-            fputc('}', stream);
-            break;
-    }
+/** Output JsonValue object to file, with optional formatting. */
+void json_fencode(FILE *stream, JsonValue *item, bool pretty) {
+    _json_fencode(stream, item, pretty, 0);
 }

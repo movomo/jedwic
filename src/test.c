@@ -251,35 +251,51 @@ int test_decoder() {
     bool error;
 
     jsval = json_sdecode("null", &error);
-    json_fencode(stdout, &jsval);
+    json_fencode(stdout, &jsval, true);
     printf("\n");
 
     jsval = json_sdecode("true", &error);
-    json_fencode(stdout, &jsval);
+    json_fencode(stdout, &jsval, true);
     printf("\n");
 
     jsval = json_sdecode("false", &error);
-    json_fencode(stdout, &jsval);
+    json_fencode(stdout, &jsval, true);
     printf("\n");
 
     jsval = json_sdecode("0", &error);
-    json_fencode(stdout, &jsval);
+    json_fencode(stdout, &jsval, true);
     printf("\n");
 
     jsval = json_sdecode("1.5e3", &error);
-    json_fencode(stdout, &jsval);
+    json_fencode(stdout, &jsval, true);
     printf("\n");
 
     jsval = json_sdecode("\"spam\\u0020eggs\\n\\\"ham\\\"\\tjam\"", &error);
-    json_fencode(stdout, &jsval);
+    json_fencode(stdout, &jsval, true);
     printf("\n");
 
     jsval = json_sdecode("[1, 2, 3, 4, 5]", &error);
-    json_fencode(stdout, &jsval);
+    json_fencode(stdout, &jsval, false);
     printf("\n");
 
     jsval = json_sdecode("{\"a\": 1, \"b\": 2, \"c\": 3}", &error);
-    json_fencode(stdout, &jsval);
+    json_fencode(stdout, &jsval, false);
+    printf("\n");
+
+    jsval = json_sdecode(
+        "\
+            {\
+                \"null\": null,\
+                \"bool\": false,\
+                \"number\": [ -1.0, 0, 1.2e3, 4E5, 6.789 ],\
+                \"object\": { \"spam\": true }\
+            }\
+        ",
+        &error
+    );
+    json_fencode(stdout, &jsval, false);
+    printf("\n");
+    json_fencode(stdout, &jsval, true);
     printf("\n");
 
     return 1;
